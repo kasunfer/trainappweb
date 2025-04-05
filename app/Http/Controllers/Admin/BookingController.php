@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\RouteFee;
+use App\Models\Setting;
 use App\Models\Station;
 use App\Models\TrainSchedule;
 use App\Models\TrainSeat;
@@ -66,21 +67,24 @@ class BookingController extends Controller
 
         $trainSchedule = TrainSchedule::find($request->schedule_id);
         if (!$trainSchedule) {
-            return response()->json(['message' => 'Invalid schedule ID.'], 400);
+            return response()->json(['message' => 'Invalid schedule ID.'], 500);
         }
 
-        $bookingLimit = 5;
+        $bookingLimit =Setting::where('key','TicketLimit')->first()->value;
         $bookingId = [];
+        if (count($request->seats) > $bookingLimit) {
+            return response()->json(['message' => "Seat Count is exceeded to Booking limit."], 500);
+        }
         foreach ($request->seats as $seatId) {
             if ($seatId != null) {
                 $seat = TrainSeat::find($seatId);
 
                 if (!$seat) {
-                    return response()->json(['message' => "Seat ID {$seatId} not found."], 400);
+                    return response()->json(['message' => "Seat ID {$seatId} not found."], 500);
                 }
 
                 if ($seat->is_booked) {
-                    return response()->json(['message' => "Seat {$seat->seat_number} is already booked."], 400);
+                    return response()->json(['message' => "Seat {$seat->seat_number} is already booked."], 500);
                 }
 
                 $existingBookingsCount = Booking::where('phone_number', $request->phone_number)
@@ -88,7 +92,7 @@ class BookingController extends Controller
                     ->whereDate('created_at', $trainSchedule->schedule_date)
                     ->count();
                 if ($existingBookingsCount >= $bookingLimit) {
-                    return response()->json(['message' => 'Booking limit reached for this phone number on this day.'], 400);
+                    return response()->json(['message' => 'Booking limit reached for this phone number on this day.'], 500);
                 }
 
                 $booking = Booking::create([
@@ -153,7 +157,7 @@ class BookingController extends Controller
     }
     public function getSchedulesByDate(Request $request)
     {
-        $schedules = TrainSchedule::where('schedule_date', $request->date)->get();
+        $schedules = TrainSchedule::with('train')->where('schedule_date', $request->date)->get();
         return response()->json(['schedules' => $schedules]);
     }
 

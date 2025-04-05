@@ -16,55 +16,8 @@
   </div>
 </section>
 <div class="bg-gray-1">
-  <section class="section-transform-top">
-    <div class="container">
-      <div class="box-booking">
-        <form class="booking-form" id="booking-form">
-          <div>
-            <p class="booking-title">Date</p>
-            <div class="form-wrap form-wrap-icon"><span class="icon mdi mdi-calendar-text"></span>
-              <input class="form-input" id="booking-date" type="text" name="date" data-constraints="" data-time-picker="date">
-            </div>
-          </div>
-          <div>
-            <p class="booking-title">Schedule</p>
-            <div class="form-wrap">
-              <select id="schedule_id">
-                <option label="placeholder"></option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <p class="booking-title">From</p>
-            <div class="form-wrap">
-              <select id="from_station">
-                <option label="placeholder"></option>
-                @foreach($stations as $station)
-                <option value="{{$station->id}}">{{$station->name}}</option>
-                @endforeach
-              </select>
-            </div>
-          </div>
-          <div>
-            <p class="booking-title">To</p>
-            <div class="form-wrap">
-              <select class="form-control" id="to_station">
-                <option label="placeholder"></option>
-                @foreach($stations as $station)
-                <option value="{{$station->id}}">{{$station->name}}</option>
-                @endforeach
-              </select>
-            </div>
-          </div>
-        </form>
-      </div>
-
-
-    </div>
-  </section>
-
   <div id="about"> </div>
-  <section class="section section-lg section-inset-1 bg-gray-1 pt-lg-0">
+  <section class="section section-lg section-inset-1 bg-gray-1 pt-lg-0 mt-5">
     <div class="container">
       <div class="row row-50 justify-content-xl-between align-items-lg-center">
         <div class="col-lg-6 wow fadeInLeft">

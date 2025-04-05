@@ -8,7 +8,7 @@
                         <button class="rd-navbar-toggle" data-rd-navbar-toggle=".rd-navbar-nav-wrap"><span></span></button>
                         <div class="rd-navbar-brand">
                             <a href="/">
-                                <img class="brand-logo-light" src="{{asset('frontend/images/logo.png')}}" alt="" width="140" height="57" />
+                                <img class="brand-logo-light" src="{{asset('frontend/images/logo.png')}}" alt="" style="width: 50px; height: auto;"/>
                             </a>
                         </div>
                     </div>

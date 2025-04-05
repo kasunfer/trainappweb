@@ -59,7 +59,7 @@
                     <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
                         <p class="mb-1">{{__('translate.password')}}<span class="text-danger"> *</span></p>
                         <div class="input-group">
-                            <input type="password" name="password" class="form-control form-control-lg @error('password') is-invalid @enderror" id="signin-password" placeholder="{{__('translate.enter_password')}}" value="{{ old('password') }}"><button  class="btn btn-light" type="button" onclick="togglePasswordVisibility('signin-password', this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
+                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" id="signin-password" placeholder="{{__('translate.enter_password')}}" value="{{ old('password') }}"><button  class="btn btn-light" type="button" onclick="togglePasswordVisibility('signin-password', this)" id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
                         </div>
                         <span class="text-danger error" id="error-password"></span>
                     </div>

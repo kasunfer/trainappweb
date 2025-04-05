@@ -67,30 +67,30 @@
         color: white;
         cursor: not-allowed;
     }
+
     .payment-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    margin-right: 15px;
-}
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        margin-right: 15px;
+    }
 
-.payment-label input {
-    display: none;
-}
+    .payment-label input {
+        display: none;
+    }
 
-.payment-label img {
-    width: 80px;
-    height: auto;
-    border: 2px solid transparent;
-    border-radius: 5px;
-    transition: all 0.3s ease-in-out;
-}
+    .payment-label img {
+        width: 80px;
+        height: auto;
+        border: 2px solid transparent;
+        border-radius: 5px;
+        transition: all 0.3s ease-in-out;
+    }
 
-.payment-label input:checked + img {
-    border: 2px solid #007bff;
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-}
-
+    .payment-label input:checked+img {
+        border: 2px solid #007bff;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    }
 </style>
 @endpush
 @section('content')
@@ -131,7 +131,7 @@
                             <div class="row">
                                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
                                     <p class="mb-1">{{__('translate.mobile')}}</p>
-                                    <input type="number" id="phone_number" class="form-control" name="phone_number" required>
+                                    <input type="number" id="phone_number" placeholder="947********" class="form-control" name="phone_number" maxlength="11" oninput="limitPhoneNumberLength(this)" required>
                                     <input type="hidden" id="price" class="form-control" name="price" required>
                                     <input type="hidden" id="price-form" class="form-control" name="price_form" required>
                                 </div>
@@ -189,18 +189,18 @@
                                             <img src="https://payherestorage.blob.core.windows.net/payhere-resources/www/images/PayHere-Logo.png" alt="PayHere">
                                         </label>
                                         <label class="payment-label">
-                                            <input type="radio" name="payment_method" value="stripe" required>
+                                            <input type="radio" name="payment_method" value="stripe" required checked>
                                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRek2EqBo5YIE0TPMVMlIFA594WZZeuqYdAQQ&s" alt="Stripe">
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
 
-<button type="submit" class="btn btn-primary submit">Book Seat</button>
-</div>
+                                    <button type="submit" class="btn btn-primary submit">Book Seat</button>
+                                </div>
                             </div>
 
-                            
+
                         </form>
                     </div>
                 </div>
@@ -222,11 +222,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const bookingId = urlParams.get('id');
         if (bookingId) {
-                openPDFTab(bookingId, function(response) {
-                    window.location.href = '/booking';
-                });
-            }       
-            function openPDFTab(bookingIds, callback) {
+            openPDFTab(bookingId, function(response) {
+                window.location.href = '/booking';
+            });
+        }
+
+        function openPDFTab(bookingIds, callback) {
             let print_url = "{{ route('front-print.ticket', ['id' => ':id']) }}";
             print_url = print_url.replace(':id', encodeURIComponent(bookingIds));
 
@@ -243,9 +244,9 @@
                 callback();
             }
         }
- 
-            
-            $('#date').on('change', function() {
+
+
+        $('#date').on('change', function() {
             let selectedDate = $(this).val();
             $('#schedule_id').prop('disabled', true).html('<option value="">Loading...</option>');
 
@@ -258,7 +259,7 @@
                 success: function(response) {
                     $('#schedule_id').prop('disabled', false).html('<option value="">Select Schedule</option>');
                     response.schedules.forEach(schedule => {
-                        $('#schedule_id').append(`<option value="${schedule.id}">${schedule.schedule_date} - ${schedule.departure_time}</option>`);
+                        $('#schedule_id').append(`<option value="${schedule.id}">${schedule.train.name}- ${schedule.departure_time}</option>`);
                     });
                 }
             });
@@ -304,10 +305,10 @@
                         let seatClass = isBooked ? "seat booked" : "seat available";
 
                         let seatHtml = `
-            <div class="${seatClass}" data-seat-id="${seat.id}" data-seat-number="${seat.seat_number}">
+            <div class="${seatClass} seat-checkbox" data-seat-id="${seat.id}" data-seat-number="${seat.seat_number}">
                     <input type="checkbox" class="seat-checkbox" data-seat-id="${seat.id}" id="seat-${seat.id}" name="seats[]" value="${seat.id}" style="display: none;" ${isBooked ? 'disabled' : ''}>
 
-                    <label for="seat-${seat.id}" class="${isBooked ? 'booked' : ''}" ${isBooked ? 'disabled' : ''}>
+                    <label for="seat-${seat.id}" class="${isBooked ? 'booked' : ''}" ${isBooked ? 'disabled' : ''} style="${!isBooked ? 'cursor: pointer;' : ''}">
                         ${seat.seat_number}
                     </label>
             </div>`;
@@ -347,7 +348,17 @@
         });
         $('#booking-form').submit(function(e) {
             e.preventDefault();
+            let phoneNumber = $('#phone_number').val();
 
+            if (phoneNumber.length !== 11) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Phone number must be 11 digits!',
+                });
+                return;
+
+            }
             if (selectedSeats.length === 0) {
                 Swal.fire({
                     title: 'Operation Failed?',
@@ -434,7 +445,7 @@
                                         var paymentMethod = $('input[name="payment_method"]:checked').val();
 
                                         console.log(response);
-                                        
+
                                         if (paymentMethod === 'stripe') {
                                             processStripePayment(response.data.items, response.data.price, response.data.email);
                                         } else {
@@ -458,13 +469,23 @@
                                 //     }
                                 // });
                             },
-                            error: function(xhr) {
-                                var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred while booking the seats.';
-                                Swal.fire({
-                                    title: 'Error',
-                                    text: errorMessage,
-                                    icon: 'error',
-                                });
+                            error: function(xhr, status, error) {
+                                var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'Error booking seats: ' + error;
+                                if (xhr.status == 500) {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: errorMessage,
+                                        icon: 'error',
+                                        confirmButtonText: 'Ok',
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: errorMessage,
+                                        icon: 'error',
+                                        confirmButtonText: 'Ok',
+                                    });
+                                }
                             }
                         });
                     } else {
@@ -484,6 +505,7 @@
                 }
             });
         }
+
         function openPrintTab(bookingIds, callback) {
             if (!Array.isArray(bookingIds)) {
                 console.error("Invalid booking IDs. Expected an array.");
@@ -510,41 +532,41 @@
         }
 
 
-     
+
         function processStripePayment(bookingIds, price, email) {
-    $.ajax({
-        url: "/stripe-checkout",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({
-            amount: price * 100,
-            email: email,
-            bookingIds: bookingIds
-        }),
-        success: function(data) {
-            console.log(data);
-            
-            if (data.id) {
-                var stripe = Stripe(data.publicKey);
+            $.ajax({
+                url: "/stripe-checkout",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    amount: price * 100,
+                    email: email,
+                    bookingIds: bookingIds
+                }),
+                success: function(data) {
+                    console.log(data);
+
+                    if (data.id) {
+                        var stripe = Stripe(data.publicKey);
                 stripe.redirectToCheckout({ sessionId: data.id });
-            } else {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Failed to initialize Stripe payment.',
-                    icon: 'error',
-                });
-            }
-        },
-        error: function(xhr) {
-            console.error("Stripe error:", xhr);
-            Swal.fire({
-                title: 'Error',
-                text: 'An error occurred while processing the payment.',
-                icon: 'error',
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Failed to initialize Stripe payment.',
+                            icon: 'error',
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    console.error("Stripe error:", xhr);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'An error occurred while processing the payment.',
+                        icon: 'error',
+                    });
+                }
             });
         }
-    });
-}
 
 
         function processPayHerePayment(response) {
@@ -610,6 +632,12 @@
         }
 
     });
+
+    function limitPhoneNumberLength(input) {
+        if (input.value.length > 11) {
+            input.value = input.value.slice(0, 11);
+        }
+    }
 </script>
 
 @endsection

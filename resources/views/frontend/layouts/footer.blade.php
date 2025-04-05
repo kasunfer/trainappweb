@@ -2,7 +2,7 @@
         <div class="container wow-outer">
           <div class="wow fadeIn">
             <div class="row row-60">
-              <div class="col-12"><a href="#"><img src="{{asset('frontend/images/logo.png')}}" alt="" width="180" height="65"/></a></div>
+              <div class="col-12"><a href="#"><img src="{{asset('frontend/images/logo.png')}}" alt="" style="width: 50px; height: auto;"/></a></div>
               <div class="col-12">
                 <ul class="footer-minimal-nav">
                   <li><a href="#about">About</a></li>

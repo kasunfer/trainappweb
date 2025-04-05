@@ -89,7 +89,7 @@
                     <div class="row">
                         <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
                             <p class="mb-1">{{__('translate.mobile')}}</p>
-                            <input type="number" id="phone_number" class="form-control" name="phone_number" required>
+                            <input type="number" id="phone_number" class="form-control" placeholder="947********" name="phone_number" maxlength="11" oninput="limitPhoneNumberLength(this)" required>
                             <input type="hidden" id="price" class="form-control" name="price" required>
                         </div>
                         <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
@@ -126,8 +126,8 @@
                             </select>
                         </div>
                     </div>
-
-                    <div class="row">
+                    <br>
+                    <div class="row  mt-5">
                         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
 
                             <div id="seat-layout" class="seat-layout" style="display: none;">
@@ -137,7 +137,8 @@
                         </div>
 
                     </div>
-                    <div class="row mt-2">
+                    <br>
+                    <div class="row mt-5">
                         <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
 
                             <button type="submit" class="btn btn-primary submit">Book Seat</button>
@@ -153,7 +154,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        // Step 1: Fetch Schedules Based on Date
+       
         $('#date').on('change', function() {
             let selectedDate = $(this).val();
             $('#schedule_id').prop('disabled', true).html('<option value="">Loading...</option>');
@@ -167,7 +168,7 @@
                 success: function(response) {
                     $('#schedule_id').prop('disabled', false).html('<option value="">Select Schedule</option>');
                     response.schedules.forEach(schedule => {
-                        $('#schedule_id').append(`<option value="${schedule.id}">${schedule.schedule_date} - ${schedule.departure_time}</option>`);
+                        $('#schedule_id').append(`<option value="${schedule.id}">${schedule.train.name} - ${schedule.departure_time}</option>`);
                     });
                 }
             });
@@ -190,31 +191,30 @@
                     to_station_id: toStationId
                 },
                 success: function(response) {
-                    $('#seat-layout').empty(); // Clear previous seat layout
+                    $('#seat-layout').empty();
 
-                    let seatsPerRow = 4; // Two seats on left, aisle, two seats on right
-                    let aisleWidth = 40; // Width of the aisle space
+                    let seatsPerRow = 4;
+                    let aisleWidth = 40;
 
                     let rowDiv = null;
 
                     response.seats.forEach((seat, index) => {
                         if (index % seatsPerRow === 0) {
-                            rowDiv = $('<div class="seat-row"></div>'); // Create new row
+                            rowDiv = $('<div class="seat-row"></div>');
                             $('#seat-layout').append(rowDiv);
                         }
 
                         let seatPosition = index % seatsPerRow;
 
-                        // Add the aisle space after two seats (middle of the row)
                         if (seatPosition === 2) {
                             rowDiv.append(`<div class="seat-gap" style="width: ${aisleWidth}px;"></div>`);
                         }
 
-                        let isBooked = response.booked_seat_ids.includes(seat.id); // Check if seat is booked
+                        let isBooked = response.booked_seat_ids.includes(seat.id);
                         let seatClass = isBooked ? "seat booked" : "seat available";
 
                         let seatHtml = `
-            <div class="${seatClass}" data-seat-id="${seat.id}" data-seat-number="${seat.seat_number}">
+            <div class="${seatClass} seat-checkbox" data-seat-id="${seat.id}" data-seat-number="${seat.seat_number}">
                     <input type="checkbox" class="seat-checkbox" data-seat-id="${seat.id}" id="seat-${seat.id}" name="seats[]" value="${seat.id}" style="display: none;" ${isBooked ? 'disabled' : ''}>
 
                     <label for="seat-${seat.id}" class="${isBooked ? 'booked' : ''}" ${isBooked ? 'disabled' : ''}>
@@ -259,7 +259,16 @@
 
         $('#booking-form').submit(function(e) {
             e.preventDefault();
+            let phoneNumber = $('#phone_number').val();
+            if (phoneNumber.length !== 11) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Phone number must be 11 digits!',
+                });
+                return;
 
+            }
             if (selectedSeats.length === 0) {
                 Swal.fire({
                     title: 'Operation Failed?',
@@ -303,7 +312,22 @@
 
                 },
                 error: function(xhr, status, error) {
-                    alert('Error booking seats: ' + error);
+                    var errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'Error booking seats: ' + error;
+                    if (xhr.status==500) {
+                        Swal.fire({
+                        title: 'Error',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonText: 'Ok',
+                    });
+                    }else{
+                        Swal.fire({
+                        title: 'Error',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonText: 'Ok',
+                        });
+                    }
                 }
             });
         });
@@ -313,7 +337,7 @@
         return;
     }
 
-    const bookingIdsParam = bookingIds.join(','); // Convert array to comma-separated string
+    const bookingIdsParam = bookingIds.join(',');
 
     let print_url = "{{ route('print.ticket', ['id' => ':id']) }}";
     print_url = print_url.replace(':id', encodeURIComponent(bookingIdsParam)); 
@@ -332,6 +356,11 @@
     }
 }
     });
+    function limitPhoneNumberLength(input) {
+        if (input.value.length > 11) {
+            input.value = input.value.slice(0, 11);
+        }
+    }
 </script>
 
 @endsection

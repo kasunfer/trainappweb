@@ -11,15 +11,22 @@
       </li><!-- End Dashboard Nav -->
   @if(Gate::any(['view-trains', 'view-stations', 'view-route-fee', 'view-trains-schedules', 'view-booking', 'view-ticket-verifying']))
       <li class="nav-item">
-        <a class="nav-link {{ Request::is('admin/train') || Request::is('admin/train/create') || Request::is('admin/station') || Request::is('admin/station/create') 
+        <a class="nav-link {{ Request::is('admin/train') || Request::is('admin/train/create') || Request::is('admin/setting') || Request::is('admin/station') || Request::is('admin/station/create') 
         || Request::is('admin/route-fee') || Request::is('admin/route-fee/create') || Request::is('admin/train-schedules') || 
         Request::is('admin/train-schedules/create') || Request::is('admin/bookings/create') || Request::is('admin/bookings/create') ? 'collapsed' : '' }}" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-journal-text"></i><span>Schedule & Settings</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="forms-nav" class="nav-content collapse {{ Request::is('admin/train') || Request::is('admin/train/create') || Request::is('admin/station') || Request::is('admin/station/create') 
+        <ul id="forms-nav" class="nav-content collapse {{ Request::is('admin/train') || Request::is('admin/train/create') || Request::is('admin/setting') || Request::is('admin/station') || Request::is('admin/station/create') 
         || Request::is('admin/route-fee') || Request::is('admin/route-fee/create') || Request::is('admin/train-schedules') || 
         Request::is('admin/train-schedules/create') || Request::is('admin/bookings') || Request::is('admin/bookings/create') || 
         Request::is('admin/ticket-verify') || Request::is('admin/ticket-verify/create') ? ' show' : '' }}" data-bs-parent="#sidebar-nav">
+        @can('view-settings')
+        <li class="{{ Request::is('admin/setting') ? 'active' : '' }}">
+            <a href="{{route('setting.index')}}">
+              <i class="bi bi-circle"></i><span>Master Setting</span>
+            </a>
+          </li>
+        @endcan
         @can('view-trains')
         <li class="{{ Request::is('admin/train') ? 'active' : '' }}">
             <a href="{{route('train.index')}}">
@@ -102,10 +109,10 @@
 @endif
 @if(Gate::any(['view-roles', 'create-roles']))
       <li class="nav-item">
-        <a class="nav-link {{ Request::is('admin/roles') || Request::is('admin/roles/create') || Request::is('admin/roles*') ? 'collapsed' : '' }}" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link {{ Request::is('admin/roles') || Request::is('admin/roles/create') || Request::is('admin/roles*') ? 'collapsed' : '' }}" data-bs-target="#roles-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-journal-text"></i><span>Roles And Permissions</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="forms-nav" class="nav-content collapse {{ Request::is('admin/roles') || Request::is('admin/roles/create') || Request::is('admin/roles*') ? ' show' : '' }}" data-bs-parent="#sidebar-nav">
+        <ul id="roles-nav" class="nav-content collapse {{ Request::is('admin/roles') || Request::is('admin/roles/create') || Request::is('admin/roles*') ? ' show' : '' }}" data-bs-parent="#sidebar-nav">
           @can('view-roles')
         <li class="{{ Request::is('admin/roles') ? 'active' : '' }}">
             <a href="{{route('roles.index')}}">
@@ -126,7 +133,7 @@
 @if(Gate::any(['view-user', 'create-user']))
       <li class="nav-item">
         <a class="nav-link {{ Request::is('admin/users') || Request::is('admin/users/create') ? 'collapsed' : '' }}" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-layout-text-window-reverse"></i><span>Users</span><i class="bi bi-chevron-down ms-auto"></i>
+          <i class="bi bi-person"></i><span>Users</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="tables-nav" class="nav-content collapse {{ Request::is('admin/users') || Request::is('admin/users/create') ? ' show' : '' }}" data-bs-parent="#sidebar-nav">
         @can('view-user')
@@ -146,47 +153,15 @@
         </ul>
       </li><!-- End Tables Nav -->
 @endif
-      {{--<li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-bar-chart"></i><span>Charts</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="charts-chartjs.html">
-              <i class="bi bi-circle"></i><span>Chart.js</span>
-            </a>
-          </li>
-          <li>
-            <a href="charts-apexcharts.html">
-              <i class="bi bi-circle"></i><span>ApexCharts</span>
-            </a>
-          </li>
-          <li>
-            <a href="charts-echarts.html">
-              <i class="bi bi-circle"></i><span>ECharts</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Charts Nav -->--}}
       @if(Gate::any(['view-reports', 'export-reports']))
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
+        <a class="nav-link collapsed {{ Request::is('admin/booking-report')? 'collapsed' : '' }}" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-file-earmark-bar-graph"></i><span>Reports</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="icons-bootstrap.html">
-              <i class="bi bi-circle"></i><span>Bootstrap Icons</span>
-            </a>
-          </li>
-          <li>
-            <a href="icons-remix.html">
-              <i class="bi bi-circle"></i><span>Remix Icons</span>
-            </a>
-          </li>
-          <li>
-            <a href="icons-boxicons.html">
-              <i class="bi bi-circle"></i><span>Boxicons</span>
+        <ul id="icons-nav" class="nav-content collapse {{ Request::is('admin/booking-report')  ? ' show' : '' }}" data-bs-parent="#sidebar-nav">
+          <li class="{{ Request::is('admin/booking-report') ? 'active' : '' }}">
+            <a href="{{ route('booking.report') }}">
+              <i class="bi bi-circle"></i><span>Booking Report</span>
             </a>
           </li>
         </ul>
