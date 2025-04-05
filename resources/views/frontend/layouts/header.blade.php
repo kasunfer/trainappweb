@@ -20,10 +20,11 @@
                                 <li class="rd-nav-item"><a class="rd-nav-link" href="#contact">{{__('menu.contact-us')}}</a></li>
                                 <li class="rd-nav-item"><a class="rd-nav-link" href="#news">News</a></li>
                                 <li class="rd-nav-item"><a class="rd-nav-link" href="#terms">Terms & Conditions</a></li>
+                                <li class="rd-nav-item"><a class="button button-white button-sm me-3" href="{{route('bookingfront')}}">Book Now</a></li>
                             </ul>
                         </div>
                     </div>
-                    <a class="button button-white button-sm me-3" href="{{route('bookingfront')}}">Book Now</a>
+                    
 
                 </div>
             </div>
