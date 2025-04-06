@@ -119,41 +119,24 @@ class HomeController extends Controller
         Session::put('otp_phone', $phoneNumber);
 
         $message = "Your OTP is: $otp Ralway Booking Portal";
-        $user = "94776254981";
-        $password = "4345";
-        $text =$message;
-        $to = $phoneNumber;
 
-        $baseurl = "https://www.textit.biz/sendmsg";
-        $url = "$baseurl/?id=$user&pw=$password&to=$to&text=$text";
-        $ret = file($url);
+        $apiUrl = "https://www.textit.biz/sendmsg/?id=94776254981&pw=4345&to=$phoneNumber&text=" . urlencode($message);
 
-        $res = explode(":", $ret[0]);
+        $ch = curl_init();
 
-        if (trim($res[0]) == "OK") {
-            return response()->json(['success' => true, 'otp' => $otp, 'message' => 'OTP sent successfully.']);
-        } else {
-            return response()->json(['success' => false, 'message' => "Error sending OTP:$res[1]"]);
+        curl_setopt($ch, CURLOPT_URL, $apiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
+        $response = curl_exec($ch);
+
+        if ($response === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            return response()->json(['success' => false, 'message' => "Error sending OTP: $error"]);
         }
-        // dd($phoneNumber);
-        // $apiUrl = "https://www.textit.biz/sendmsg/?id=94776254981&pw=4345&to=$phoneNumber&text=" . urlencode($message);
 
-        // $ch = curl_init();
-
-        // curl_setopt($ch, CURLOPT_URL, $apiUrl);
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        // $response = curl_exec($ch);
-
-        // if ($response === false) {
-        //     $error = curl_error($ch);
-        //     curl_close($ch);
-        //     return response()->json(['success' => false, 'message' => "Error sending OTP: $error"]);
-        // }
-
-        // curl_close($ch);
-        // return response()->json(['success' => true, 'otp' => $otp, 'message' => 'OTP sent successfully.']);
+        curl_close($ch);
+        return response()->json(['success' => true,'otp'=>$otp, 'message' => 'OTP sent successfully.']);
     }
     public function verifyOtp(Request $request)
     {
